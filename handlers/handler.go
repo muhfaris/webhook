@@ -69,6 +69,13 @@ func HandleWebhook(c *fiber.Ctx) error {
 	argAll := strings.Join(args, " ")
 	command := webhook.ExecuteCommand + argAll
 
+	tmpCommand := strings.TrimSpace(command)
+	if command == "" || tmpCommand == "" {
+		return c.Status(fiber.StatusInternalServerError).JSON(map[string]interface{}{
+			"message": fmt.Sprintf("the id %s don't have command execution", payload.ID),
+		})
+	}
+
 	if err := pkg.ExecuteCommand(command, webhook.Workdir); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(map[string]interface{}{
 			"message": "error executing command",

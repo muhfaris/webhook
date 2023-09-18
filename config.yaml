@@ -6,6 +6,6 @@ webhooks:
     workdir: ""
     command_arguments:
       - name: "--image"
-        source: "payload.docker_image"
+        source: "data.docker_image"
       - name: "captain-nginx"
         source: ""

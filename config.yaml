@@ -1,0 +1,11 @@
+port: 8080
+webhooks:
+  - id: dev-user-svc
+    token: token
+    execute_command: "docker service update"
+    workdir: ""
+    command_arguments:
+      - name: "--image"
+        source: "payload.docker_image"
+      - name: "captain-nginx"
+        source: ""

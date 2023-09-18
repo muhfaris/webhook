@@ -4,11 +4,14 @@ import (
 	"fmt"
 
 	"github.com/spf13/viper"
+
+	"github.com/go-playground/validator/v10"
 )
 
 var App = struct {
-	Port     int      `json:"port" mapstructure:"port"`
-	Webhooks Webhooks `json:"webhooks" mapstructure:"webhooks"`
+	Port      int                 `json:"port" mapstructure:"port"`
+	Webhooks  Webhooks            `json:"webhooks" mapstructure:"webhooks"`
+	Validator *validator.Validate `json:"-" mapstructure:"-"`
 }{}
 
 type WebhookConfig struct {
@@ -56,6 +59,8 @@ func ReadConfig(path string) error {
 	if App.Port == 0 {
 		App.Port = 8081
 	}
+
+	App.Validator = validator.New(validator.WithRequiredStructEnabled())
 
 	return nil
 }

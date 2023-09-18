@@ -12,14 +12,15 @@ import (
 )
 
 type WebhookPayload struct {
-	ID      string      `json:"id"`
-	Token   string      `json:"token"`
+	ID      string      `json:"id" validate:"required"`
+	Token   string      `json:"token" validate:"required"`
 	Payload interface{} `json:"data"`
 }
 
 var configMutex sync.Mutex
 
 func HandleWebhook(c *fiber.Ctx) error {
+	var ctx = c.Context()
 	if c.Method() != fiber.MethodPost {
 		return c.Status(fiber.StatusMethodNotAllowed).SendString("method not allowed")
 	}
@@ -30,6 +31,10 @@ func HandleWebhook(c *fiber.Ctx) error {
 	var payload WebhookPayload
 	if err := c.BodyParser(&payload); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(map[string]interface{}{"message": "failed to parse JSON"})
+	}
+
+	if err := configs.App.Validator.StructCtx(ctx, payload); err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(map[string]interface{}{"message": "invalid data", "error": err.Error()})
 	}
 
 	webhook, err := configs.App.Webhooks.ByID(payload.ID)
